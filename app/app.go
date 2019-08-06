@@ -7,14 +7,23 @@ import (
 	"time"
 
 	"github.com/brenoandrade/estrategia/model"
+	"github.com/brenoandrade/estrategia/store"
 	"github.com/gorilla/mux"
-	"github.com/tradersclub/TCIdeas/store"
 )
 
 const (
 	readTimeout  = 10
 	writeTimeout = 10
 )
+
+// Wrapper for handler
+type Wrapper struct {
+	router *mux.Router
+}
+
+func (wrapper *Wrapper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	wrapper.router.ServeHTTP(w, r)
+}
 
 // Server struct http management
 type Server struct {
@@ -24,6 +33,11 @@ type Server struct {
 	ListenAddr *net.TCPAddr
 }
 
+// App struct base application
+type App struct {
+	Srv *Server
+}
+
 // StartServer init listener
 func (app *App) StartServer() {
 	app.Srv.Server = &http.Server{
@@ -31,15 +45,17 @@ func (app *App) StartServer() {
 		WriteTimeout: time.Duration(writeTimeout) * time.Second,
 	}
 
-	addr := model.GetConfig().Port
+	config := model.GetConfig()
 
-	listener, err := net.Listen("tcp", addr)
+	listener, err := net.Listen("tcp", config.Port)
 	if err != nil {
 		return
 	}
 
 	app.Srv.ListenAddr = listener.Addr().(*net.TCPAddr)
 	log.Println("[SERVER] on:", listener.Addr().String())
+
+	app.Srv.Store = store.NewSQLSupplier(config.ConnectionString)
 
 	go func() {
 		var err error
@@ -50,11 +66,6 @@ func (app *App) StartServer() {
 			time.Sleep(time.Second)
 		}
 	}()
-}
-
-// App struct base application
-type App struct {
-	Srv *Server
 }
 
 // New make instance App
