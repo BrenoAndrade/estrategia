@@ -8,13 +8,14 @@ import (
 	"github.com/brenoandrade/estrategia/services"
 )
 
-func getRecommendationTags(repo *model.Repo, ch chan bool) {
+func getRecommendationTagsAndSave(repo *model.Repo, ch chan bool) {
 	repo.Tags = services.GetWatsonKeywords(repo.URL)
+	services.SetRepo(repo)
 	ch <- true
 }
 
-// GetRepositories adsa
-func (app *App) GetRepositories(username string) ([]*model.Repo, *model.Error) {
+// GetRepos pega todos os repos "starred" de um usuário
+func (app *App) GetRepos(username string) ([]*model.Repo, *model.Error) {
 	repos, err := services.GetRepos(username)
 	if err != nil {
 		return nil, err
@@ -24,7 +25,7 @@ func (app *App) GetRepositories(username string) ([]*model.Repo, *model.Error) {
 	ch := make(chan bool, size)
 
 	for _, repo := range repos {
-		go getRecommendationTags(repo, ch)
+		go getRecommendationTagsAndSave(repo, ch)
 	}
 
 	for i := 0; i < size; i++ {
@@ -34,9 +35,9 @@ func (app *App) GetRepositories(username string) ([]*model.Repo, *model.Error) {
 	return repos, nil
 }
 
-// AddTag adsad
+// AddTag adiciona uma tag a um repo
 func (app *App) AddTag(repoID int, tag string) (*model.Repo, *model.Error) {
-	repos, err := services.SearchRepos(strconv.Itoa(repoID))
+	repos, err := services.SearchRepos("*" + strconv.Itoa(repoID) + "*")
 	if err != nil {
 		return nil, err
 	}
@@ -46,10 +47,16 @@ func (app *App) AddTag(repoID int, tag string) (*model.Repo, *model.Error) {
 		repo = repos[0]
 	}
 
+	if repo == nil {
+		return nil, model.NewError("app.repos.add_tag", "this repo not found", http.StatusNotFound)
+	}
+
+	key := repo.Key()
 	if !repo.AddTag(tag) {
 		return nil, model.NewError("app.repos.add_tag", "this tag has already been added", http.StatusConflict)
 	}
 
+	services.DelRepo(key)
 	if err := services.SetRepo(repo); err != nil {
 		return nil, err
 	}
@@ -57,9 +64,9 @@ func (app *App) AddTag(repoID int, tag string) (*model.Repo, *model.Error) {
 	return repo, nil
 }
 
-// DelTag adsad
+// DelTag remove uma tag de um repo
 func (app *App) DelTag(repoID int, tag string) (*model.Repo, *model.Error) {
-	repos, err := services.SearchRepos(strconv.Itoa(repoID))
+	repos, err := services.SearchRepos("*" + strconv.Itoa(repoID) + "*")
 	if err != nil {
 		return nil, err
 	}
@@ -69,10 +76,16 @@ func (app *App) DelTag(repoID int, tag string) (*model.Repo, *model.Error) {
 		repo = repos[0]
 	}
 
+	if repo == nil {
+		return nil, model.NewError("app.repos.add_tag", "this repo not found", http.StatusNotFound)
+	}
+
+	key := repo.Key()
 	if !repo.DelTag(tag) {
 		return nil, model.NewError("app.repos.del_tag", "tag not found", http.StatusNotFound)
 	}
 
+	services.DelRepo(key)
 	if err := services.SetRepo(repo); err != nil {
 		return nil, err
 	}
@@ -80,7 +93,7 @@ func (app *App) DelTag(repoID int, tag string) (*model.Repo, *model.Error) {
 	return repo, nil
 }
 
-// Search asdasd
+// Search procura entre as tags, repos que se encaixam na pesquisa
 func (app *App) Search(pattern string) ([]*model.Repo, *model.Error) {
-	return services.SearchRepos(pattern)
+	return services.SearchRepos("*" + pattern + "*")
 }

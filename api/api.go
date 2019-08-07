@@ -9,18 +9,18 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Routes struct of router
+// Routes struct das rotas default
 type Routes struct {
 	Root *mux.Router
 }
 
-// API struct main for api
+// API struct principal do pacote
 type API struct {
 	App        *app.App
 	BaseRoutes *Routes
 }
 
-// Public asdsa
+// Public é um middleware para as rotas
 func (api *API) Public(h func(*Context, http.ResponseWriter, *http.Request)) http.Handler {
 	return &handler{
 		app:        api.App,
@@ -28,7 +28,7 @@ func (api *API) Public(h func(*Context, http.ResponseWriter, *http.Request)) htt
 	}
 }
 
-// Init start the module
+// Init inicia o api (rotas)
 func Init(a *app.App, root *mux.Router) *API {
 	api := &API{
 		App:        a,
@@ -45,7 +45,7 @@ func Init(a *app.App, root *mux.Router) *API {
 	return api
 }
 
-// Handle404 route base for not found
+// Handle404 rota padrão para notfound
 func Handle404(w http.ResponseWriter, r *http.Request) {
 	err := model.NewError("handle.404", "Not found.", http.StatusNotFound)
 

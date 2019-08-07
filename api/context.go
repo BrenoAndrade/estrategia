@@ -6,7 +6,7 @@ import (
 	"github.com/brenoandrade/estrategia/app"
 )
 
-// Context sdf
+// Context struct para injetar o app e os parametros nos handlers
 type Context struct {
 	App    *app.App
 	Params *Params

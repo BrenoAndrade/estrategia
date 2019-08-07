@@ -1,6 +1,6 @@
 package model
 
-// ConfigFile struct for config file
+// ConfigFile estrutura de configuração
 type ConfigFile struct {
 	Port      string
 	URLWatson string
@@ -8,12 +8,12 @@ type ConfigFile struct {
 	URLRedis  string
 }
 
-// GetConfig get config file
+// GetConfig leria o config.json se tivesse um kk :D
 func GetConfig() ConfigFile {
 	return ConfigFile{
 		Port:      ":3001",
 		URLWatson: "https://gateway-wdc.watsonplatform.net/natural-language-understanding/api",
 		APIKey:    "tbi2jvQ9sIfCju9CSony03NVw8GHaxdP2DmmEiHpGrF-",
-		URLRedis:  "",
+		URLRedis:  "localhost:6379",
 	}
 }

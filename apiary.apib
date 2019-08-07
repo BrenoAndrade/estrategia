@@ -1,0 +1,98 @@
+FORMAT: 1A
+HOST: http://localhost:3001/
+
+# Estrategia
+
+Documentação da api de consumo de repos do github.
+
+## Repos [/repos/{brenoandrade}]
+
+### Listar todos os Repos "starred" de um usuário. [GET]
+
++ Response 200 (application/json)
+
+        [
+            {
+                "id": 10270250,
+                "name": "react",
+                "description": "A declarative, efficient, and flexible JavaScript library for building user interfaces.",
+                "language": "JavaScript",
+                "html_url": "https://github.com/facebook/react",
+                "tags": [
+                  "technology and computing",
+                  "programming languages",
+                  "javascript"
+                ]
+            },
+        ]
+
+## Tags [/repos/{10270250}/tags/{docker}]
+
+### Adicionar uma tag a um Repo [POST]
+
+
++ Response 201 (application/json)
+
+    + Body
+
+        {
+            "id": 10270250,
+            "name": "react",
+            "description": "A declarative, efficient, and flexible JavaScript library for building user interfaces.",
+            "language": "JavaScript",
+            "html_url": "https://github.com/facebook/react",
+            "tags": [
+              "technology and computing",
+              "programming languages",
+              "javascript",
+              "docker"
+            ]
+        }
+
+
+### Remover uma tag a um Repo [DELETE]
+
+
++ Response 200 (application/json)
+
+    + Body
+
+        {
+            "id": 10270250,
+            "name": "react",
+            "description": "A declarative, efficient, and flexible JavaScript library for building user interfaces.",
+            "language": "JavaScript",
+            "html_url": "https://github.com/facebook/react",
+            "tags": [
+              "technology and computing",
+              "programming languages",
+              "javascript"
+            ]
+        }
+
+
+## Search [/tags/{java}]
+
+### Buscar Repos por uma tag [GET]
+
+
++ Response 200 (application/json)
+
+    + Body
+
+        [
+            {
+                "id": 10270250,
+                "name": "react",
+                "description": "A declarative, efficient, and flexible JavaScript library for building user interfaces.",
+                "language": "JavaScript",
+                "html_url": "https://github.com/facebook/react",
+                "tags": [
+                  "technology and computing",
+                  "programming languages",
+                  "javascript"
+                ]
+            },
+        ]
+
+

@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 )
 
-// ToJSON turn objects into json
+// ToJSON transforma um objeto em []byte
 func ToJSON(obj interface{}) []byte {
 	b, err := json.Marshal(obj)
 	if err != nil {
@@ -15,12 +15,12 @@ func ToJSON(obj interface{}) []byte {
 	return b
 }
 
-// ByteFromJSON make struct from json
+// ByteFromJSON instancia uma estrutura através de um []byte
 func ByteFromJSON(b []byte, obj interface{}) {
 	json.Unmarshal(b, &obj)
 }
 
-// ReaderFromJSON asd
+// ReaderFromJSON instancia uma estrutura através de um io.Reader
 func ReaderFromJSON(b io.Reader, obj interface{}) {
 	bt, err := ioutil.ReadAll(b)
 	if err == nil {

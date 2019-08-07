@@ -9,7 +9,7 @@ import (
 
 const base = "https://api.github.com"
 
-// GetRepos aa
+// GetRepos se comunica com a api do github para trazer os repositoris "starred" de um determinado usuaio
 func GetRepos(username string) ([]*model.Repo, *model.Error) {
 	url := utils.MakeURL(base, "users", username, "starred")
 

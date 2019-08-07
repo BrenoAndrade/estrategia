@@ -7,21 +7,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const (
-	defaultPage  = 0
-	defaultLimit = 15
-)
-
-// Params adasdsa
+// Params struct padrão que contém todos os parâmetros declarados
 type Params struct {
-	Page     int
-	Limit    int
 	RepoID   int
 	Username string
 	Tag      string
 }
 
-// APIParamsFromRequest a
 func apiParamsFromRequest(r *http.Request) *Params {
 	params := &Params{}
 	props := mux.Vars(r)

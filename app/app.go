@@ -15,7 +15,7 @@ const (
 	writeTimeout = 30
 )
 
-// Handler for handler
+// Handler estrutura para injetar as rotas do pacote mux
 type Handler struct {
 	router *mux.Router
 }
@@ -24,18 +24,18 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.router.ServeHTTP(w, r)
 }
 
-// Server struct http management
+// Server estrutura base do servidor
 type Server struct {
 	Router *mux.Router
 	Server *http.Server
 }
 
-// App struct base application
+// App estrutura principal da aplicação
 type App struct {
 	Srv *Server
 }
 
-// StartServer init listener
+// StartServer inicia o servidor e os serviços
 func (app *App) StartServer() {
 	var handler http.Handler = &Handler{app.Srv.Router}
 
@@ -49,6 +49,7 @@ func (app *App) StartServer() {
 	}
 
 	services.InitWatson(config.URLWatson, config.APIKey)
+	services.InitRedis(config.URLRedis)
 
 	log.Println("[SERVER] on:", app.Srv.Server.Addr)
 	if err := app.Srv.Server.ListenAndServe(); err != nil {
@@ -56,7 +57,7 @@ func (app *App) StartServer() {
 	}
 }
 
-// New make instance App
+// New cria uma nova instancia do App
 func New() *App {
 	log.Println("[SERVER] initializing...")
 

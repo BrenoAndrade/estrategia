@@ -15,7 +15,7 @@ var (
 
 var watson *nlu.NaturalLanguageUnderstandingV1
 
-// InitWatson a
+// InitWatson inicia o singleton do watson
 func InitWatson(url, key string) {
 	watson, _ = nlu.NewNaturalLanguageUnderstandingV1(&nlu.NaturalLanguageUnderstandingV1Options{
 		URL:       url,
@@ -24,7 +24,7 @@ func InitWatson(url, key string) {
 	})
 }
 
-// GetWatsonKeywords a
+// GetWatsonKeywords o watson analisa o repo e sugere algumas categorias em que ele se enquadra
 func GetWatsonKeywords(url string) (data []string) {
 	log.Println("[WATSON] analyze url:", url)
 

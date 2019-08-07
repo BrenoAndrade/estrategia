@@ -1,8 +1,10 @@
 package model
 
-import "strconv"
+import (
+	"strconv"
+)
 
-// Repo model
+// Repo estrutura para um repositório
 type Repo struct {
 	ID          int      `json:"id"`
 	Name        string   `json:"name"`
@@ -12,7 +14,7 @@ type Repo struct {
 	Tags        []string `json:"tags"`
 }
 
-// Key Generate key for db
+// Key gera uma chave para ser utilizada no redis
 func (repo *Repo) Key() string {
 	key := strconv.Itoa(repo.ID)
 	for _, tag := range repo.Tags {
@@ -21,7 +23,6 @@ func (repo *Repo) Key() string {
 	return key
 }
 
-// duplicatedTag a
 func (repo *Repo) duplicatedTag(tag string) bool {
 	for _, item := range repo.Tags {
 		if item == tag {
@@ -32,7 +33,7 @@ func (repo *Repo) duplicatedTag(tag string) bool {
 	return false
 }
 
-// AddTag a
+// AddTag adiciona uma tag a um repo
 func (repo *Repo) AddTag(tag string) bool {
 	if repo.duplicatedTag(tag) {
 		return false
@@ -43,15 +44,15 @@ func (repo *Repo) AddTag(tag string) bool {
 	return true
 }
 
-// DelTag a
+// DelTag remove uma tag de um repo
 func (repo *Repo) DelTag(tag string) bool {
 	if !repo.duplicatedTag(tag) {
 		return false
 	}
 
-	data := make([]string, len(repo.Tags)-1)
+	data := make([]string, 0)
 	for _, item := range repo.Tags {
-		if item != tag {
+		if item != tag && item != "" {
 			data = append(data, item)
 		}
 	}
