@@ -1,32 +1,19 @@
 package model
 
-import (
-	"encoding/json"
-	"io/ioutil"
-	"log"
-	"os"
-)
-
 // ConfigFile struct for config file
 type ConfigFile struct {
-	Port             string
-	ConnectionString string
+	Port      string
+	URLWatson string
+	APIKey    string
+	URLRedis  string
 }
 
 // GetConfig get config file
 func GetConfig() ConfigFile {
-	file, err := ioutil.ReadFile("config.json")
-	if err != nil {
-		log.Println("[ERROR] read config file.", err)
-		os.Exit(0)
+	return ConfigFile{
+		Port:      ":3001",
+		URLWatson: "https://gateway-wdc.watsonplatform.net/natural-language-understanding/api",
+		APIKey:    "tbi2jvQ9sIfCju9CSony03NVw8GHaxdP2DmmEiHpGrF-",
+		URLRedis:  "",
 	}
-
-	config := ConfigFile{}
-	err = json.Unmarshal([]byte(file), &config)
-	if err != nil {
-		log.Println("[ERROR] create struct config file.", err)
-		os.Exit(0)
-	}
-
-	return config
 }

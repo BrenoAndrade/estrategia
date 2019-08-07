@@ -2,35 +2,32 @@ package app
 
 import (
 	"log"
-	"net"
 	"net/http"
 	"time"
 
 	"github.com/brenoandrade/estrategia/model"
-	"github.com/brenoandrade/estrategia/store"
+	"github.com/brenoandrade/estrategia/services"
 	"github.com/gorilla/mux"
 )
 
 const (
-	readTimeout  = 10
-	writeTimeout = 10
+	readTimeout  = 30
+	writeTimeout = 30
 )
 
-// Wrapper for handler
-type Wrapper struct {
+// Handler for handler
+type Handler struct {
 	router *mux.Router
 }
 
-func (wrapper *Wrapper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	wrapper.router.ServeHTTP(w, r)
+func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.router.ServeHTTP(w, r)
 }
 
 // Server struct http management
 type Server struct {
-	Store      store.Store
-	Router     *mux.Router
-	Server     *http.Server
-	ListenAddr *net.TCPAddr
+	Router *mux.Router
+	Server *http.Server
 }
 
 // App struct base application
@@ -40,32 +37,23 @@ type App struct {
 
 // StartServer init listener
 func (app *App) StartServer() {
-	app.Srv.Server = &http.Server{
-		ReadTimeout:  time.Duration(readTimeout) * time.Second,
-		WriteTimeout: time.Duration(writeTimeout) * time.Second,
-	}
+	var handler http.Handler = &Handler{app.Srv.Router}
 
 	config := model.GetConfig()
 
-	listener, err := net.Listen("tcp", config.Port)
-	if err != nil {
-		return
+	app.Srv.Server = &http.Server{
+		Handler:      handler,
+		ReadTimeout:  time.Duration(readTimeout) * time.Second,
+		WriteTimeout: time.Duration(writeTimeout) * time.Second,
+		Addr:         config.Port,
 	}
 
-	app.Srv.ListenAddr = listener.Addr().(*net.TCPAddr)
-	log.Println("[SERVER] on:", listener.Addr().String())
+	services.InitWatson(config.URLWatson, config.APIKey)
 
-	app.Srv.Store = store.NewSQLSupplier(config.ConnectionString)
-
-	go func() {
-		var err error
-		err = app.Srv.Server.Serve(listener)
-
-		if err != nil && err != http.ErrServerClosed {
-			log.Println("[SERVER] off:", err)
-			time.Sleep(time.Second)
-		}
-	}()
+	log.Println("[SERVER] on:", app.Srv.Server.Addr)
+	if err := app.Srv.Server.ListenAndServe(); err != nil {
+		log.Println("[SERVER] off:", err)
+	}
 }
 
 // New make instance App

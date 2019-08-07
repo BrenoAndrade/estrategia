@@ -13,8 +13,8 @@ import (
 func main() {
 	app := app.New()
 
-	app.StartServer()
 	api.Init(app, app.Srv.Router)
+	app.StartServer()
 
 	log.Println("[SERVER] running...")
 

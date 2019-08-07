@@ -11,14 +11,21 @@ import (
 
 // Routes struct of router
 type Routes struct {
-	Root    *mux.Router
-	APIRoot *mux.Router
+	Root *mux.Router
 }
 
 // API struct main for api
 type API struct {
 	App        *app.App
 	BaseRoutes *Routes
+}
+
+// Public asdsa
+func (api *API) Public(h func(*Context, http.ResponseWriter, *http.Request)) http.Handler {
+	return &handler{
+		app:        api.App,
+		handleFunc: h,
+	}
 }
 
 // Init start the module
@@ -30,8 +37,10 @@ func Init(a *app.App, root *mux.Router) *API {
 
 	api.BaseRoutes.Root = root
 
-	root.Handle("/status", http.HandlerFunc(returnStatusOK))
-	root.Handle("/{anything:.*}", http.HandlerFunc(Handle404))
+	api.initRepositories()
+
+	root.HandleFunc("/status", returnStatusOK)
+	root.HandleFunc("/{anything:.*}", Handle404)
 
 	return api
 }
